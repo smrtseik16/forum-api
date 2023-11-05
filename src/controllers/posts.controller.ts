@@ -1,4 +1,5 @@
 import express, { Router } from "express";
+import cors from "cors";
 import { initializeApp } from "firebase/app";
 import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
@@ -20,31 +21,31 @@ const upload = multer({ storage: multer.memoryStorage() });
 //posts reference collection
 const postsRef = collection(db, strPosts);
 
-router.get('/', async (req, res) => {
+router.get('/', cors(), async (req, res) => {
     const snapshot = await getDocs(postsRef);
     const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     res.send(list);
 });
 
-router.post('/create', upload.single("file"), async (req, res) => {
-    const dateTime = giveCurrentDateTime();
-    const storageRef = ref(storage, `files/${req.file.originalname + "-" + dateTime}`);
-
-    // Create file metadata including the content type
-    const metadata = {
-        contentType: req.file.mimetype,
-    };
-
-    // Upload the file in the bucket storage
-    const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
-    //by using uploadBytesResumable we can control the progress of uploading like pause, resume, cancel
-
-    // Grab the public url
-    const downloadURL = await getDownloadURL(snapshot.ref);
-
-    console.log('File successfully uploaded.');
-
+router.post('/create', cors(), upload.single("file"), async (req, res) => {
     try {
+        const dateTime = giveCurrentDateTime();
+        var fileName = (typeof req.file !== "undefined") ? req.file.originalname  : 'image-file';
+        const storageRef = ref(storage, `files/${fileName + "-" + dateTime}`);
+
+        // Create file metadata including the content type
+        const metadata = {
+            contentType: req.file.mimetype,
+        };
+
+        // Upload the file in the bucket storage
+        const snapshot = await uploadBytesResumable(storageRef, req.file.buffer, metadata);
+        //by using uploadBytesResumable we can control the progress of uploading like pause, resume, cancel
+
+        // Grab the public url
+        const downloadURL = await getDownloadURL(snapshot.ref);
+
+        console.log('File successfully uploaded.');
         const docRef = await addDoc(postsRef, {
           name: req.body.name,
           description: req.body.description,

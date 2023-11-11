@@ -1,3 +1,7 @@
 .env
 /node_modules
 /dist
+/forum-api-v2
+.firebase
+.firebaserc
+firebase.json

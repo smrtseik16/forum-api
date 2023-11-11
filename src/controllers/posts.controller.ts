@@ -5,7 +5,7 @@ import { getFirestore, collection, getDocs, addDoc } from "firebase/firestore";
 import { getStorage, ref, getDownloadURL, uploadBytesResumable } from "firebase/storage";
 import multer from "multer";
 import config from "../config/firebase.config.js"
-import giveCurrentDateTime from '../helpers/helpers.js'
+import { giveCurrentDateTime, sortedAsc, sortedDesc} from '../helpers/helpers.js'
 
 const strPosts = "Posts";
 
@@ -21,15 +21,18 @@ const upload = multer({ storage: multer.memoryStorage() });
 //posts reference collection
 const postsRef = collection(db, strPosts);
 
-router.get('/', cors(), async (req, res) => {
+router.get('/:asc?', cors(), async (req, res) => {
     const snapshot = await getDocs(postsRef);
-    const list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
-    res.send(list);
+    console.log(req.params.desc);
+    const isAsc = req.params.asc == 'asc' ? req.params.asc : false;
+    var list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
+    res.send((isAsc) ? sortedAsc(list) : sortedDesc(list));
 });
 
 router.post('/create', cors(), upload.single("file"), async (req, res) => {
     try {
         const dateTime = giveCurrentDateTime();
+        var dateTimeNow = new Date(Date.now()).toLocaleString();
         var fileName = (typeof req.file !== "undefined") ? req.file.originalname  : 'image-file';
         const storageRef = ref(storage, `files/${fileName + "-" + dateTime}`);
 
@@ -49,7 +52,8 @@ router.post('/create', cors(), upload.single("file"), async (req, res) => {
         const docRef = await addDoc(postsRef, {
           name: req.body.name,
           description: req.body.description,
-          image_url: downloadURL
+          image_url: downloadURL,
+          date_created: dateTimeNow
         });
         res.status(201).send({ message: `Post created with ID: ${docRef.id}`});
     } catch (e) {

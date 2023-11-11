@@ -6,4 +6,17 @@ const giveCurrentDateTime = () => {
     return dateTime;
 }
 
-export default giveCurrentDateTime;
+const sortedAsc = (arr) => {
+    return arr.sort(
+        (objA, objB) => Number(Date.parse(objA.date_created)) - Number(Date.parse(objB.date_created)),
+    );
+}
+
+const sortedDesc = (arr) => {
+    console.log(arr);
+    return arr.sort(
+        (objA, objB) => Number(Date.parse(objB.date_created)) - Number(Date.parse(objA.date_created)),
+    );
+}
+
+export { giveCurrentDateTime, sortedAsc, sortedDesc};

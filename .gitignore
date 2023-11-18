@@ -5,3 +5,6 @@
 .firebase
 .firebaserc
 firebase.json
+ui-debug.log
+firebase-debug.log
+/public

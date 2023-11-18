@@ -7,10 +7,10 @@ import functions from 'firebase-functions';
 dotenv.config();
 const app = express();
 app.set('view engine', 'ejs');
-app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({
-    extended: false
+    extended: true
 }));
+// app.use(bodyParser.json());
 app.get('/test', (req, res) => res.send('you did it mf!'));
 app.use('/post', postRouter);
 app.use('/comment', commentRouter);

@@ -12,5 +12,9 @@ const sortedDesc = (arr) => {
     console.log(arr);
     return arr.sort((objA, objB) => Number(Date.parse(objB.date_created)) - Number(Date.parse(objA.date_created)));
 };
-export { giveCurrentDateTime, sortedAsc, sortedDesc };
+
+const getDateTimeTZ = () => {
+    return new Date(Date.now()).toLocaleString('en-US', { timeZone: process.env.TIMEZONE });
+}
+export { giveCurrentDateTime, sortedAsc, sortedDesc, getDateTimeTZ };
 //# sourceMappingURL=helpers.js.map

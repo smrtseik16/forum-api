@@ -23,7 +23,6 @@ const postsRef = collection(db, strPosts);
 
 router.get('/:asc?', cors(), async (req, res) => {
     const snapshot = await getDocs(postsRef);
-    console.log(req.params.desc);
     const isAsc = req.params.asc == 'asc' ? req.params.asc : false;
     var list = snapshot.docs.map((doc) => ({ id: doc.id, ...doc.data() }));
     res.send((isAsc) ? sortedAsc(list) : sortedDesc(list));
